@@ -102,9 +102,9 @@ elif hasattr(st.session_state.run, 'status') and st.session_state.run.status == 
                     
                     # Determine pricing based on the role
                     if message.role == "user":
-                        price_per_1k_tokens = 0.001
+                        price_per_1k_tokens = 0.01
                     else:  # For assistant's messages, the cost is three times higher
-                        price_per_1k_tokens = 0.003
+                        price_per_1k_tokens = 0.03
                     
                     # Calculate tokens and cost
                     num_tokens, message_cost = calculate_message_cost(message_text, "cl100k_base", price_per_1k_tokens)
