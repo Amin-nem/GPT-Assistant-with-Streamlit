@@ -37,8 +37,8 @@ if "retry_error" not in st.session_state:
     st.session_state.retry_error = 0
 
 # Set up the page
-st.set_page_config(page_title="Enter title here")
-st.sidebar.title("Title")
+st.set_page_config(page_title="Grammar Assistant with Cost Calculator")
+st.sidebar.title("Grammar Assistant")
 st.sidebar.divider()
 st.sidebar.markdown("Your name", unsafe_allow_html=True)
 st.sidebar.markdown("Grammar bot")
