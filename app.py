@@ -92,7 +92,7 @@ elif hasattr(st.session_state.run, 'status') and st.session_state.run.status == 
             with st.chat_message(message.role):
                 for content_part in message.content:
                     message_text = content_part.text.value
-                    st.markdown(f"""<div dir="rtl"> {message_text}</div>""")
+                    st.markdown(f"""<div dir="rtl"> {message_text}</div>""", unsafe_allow_html=True)
                     
                     # Determine pricing based on the role
                     if message.role == "user":
