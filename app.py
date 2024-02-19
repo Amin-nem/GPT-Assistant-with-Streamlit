@@ -6,6 +6,15 @@ import time
 import pandas as pd
 import io
 from openai import OpenAI
+import tiktoken
+
+# calculate message cost
+def calculate_message_cost(message: str, encoding_name: str, price_per_1k_tokens: float):
+    encoding = tiktoken.get_encoding(encoding_name)
+    num_tokens = len(encoding.encode(message))
+    cost = (num_tokens / 1000) * price_per_1k_tokens
+    return num_tokens, cost
+
 
 # Initialize OpenAI client
 client = OpenAI()
@@ -73,7 +82,7 @@ if "assistant" not in st.session_state:
         metadata={'session_id': st.session_state.session_id}
     )
 
-# Display chat messages
+# Display chat messages with token count and cost information
 elif hasattr(st.session_state.run, 'status') and st.session_state.run.status == "completed":
     st.session_state.messages = client.beta.threads.messages.list(
         thread_id=st.session_state.thread.id
@@ -83,7 +92,21 @@ elif hasattr(st.session_state.run, 'status') and st.session_state.run.status == 
             with st.chat_message(message.role):
                 for content_part in message.content:
                     message_text = content_part.text.value
-                    st.markdown(f"""<div dir="rtl"> {message_text}}</div>""")
+                    st.markdown(f"""<div dir="rtl"> {message_text}</div>""")
+                    
+                    # Determine pricing based on the role
+                    if message.role == "user":
+                        price_per_1k_tokens = 0.001
+                    else:  # For assistant's messages, the cost is three times higher
+                        price_per_1k_tokens = 0.003
+                    
+                    # Calculate tokens and cost
+                    num_tokens, message_cost = calculate_message_cost(message_text, "cl100k_base", price_per_1k_tokens)
+                    
+                    # Display token count and cost info
+                    cost_info = f"Tokens: {num_tokens}, Estimated Cost: ${message_cost:.4f}"
+                    st.caption(cost_info)
+
 
 # Chat input and message creation with file ID
 if prompt := st.chat_input("How can I help you?"):
