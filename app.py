@@ -44,6 +44,12 @@ st.sidebar.markdown("Your name", unsafe_allow_html=True)
 st.sidebar.markdown("Grammar bot")
 st.sidebar.divider()
 
+
+# Add a numeric input in the sidebar for the currency conversion multiplier
+currency_multiplier = st.sidebar.number_input("Enter currency conversion multiplier", value=1.0, format="%.4f")
+currency_name = st.sidebar.text_input("Enter your currency name", value="Your Currency")
+
+
 # File uploader for CSV, XLS, XLSX
 uploaded_file = st.file_uploader("Upload your file", type=["csv", "xls", "xlsx"])
 
@@ -82,7 +88,7 @@ if "assistant" not in st.session_state:
         metadata={'session_id': st.session_state.session_id}
     )
 
-# Display chat messages with token count and cost information
+# Display chat messages with token count, cost information, and converted cost
 elif hasattr(st.session_state.run, 'status') and st.session_state.run.status == "completed":
     st.session_state.messages = client.beta.threads.messages.list(
         thread_id=st.session_state.thread.id
@@ -103,8 +109,11 @@ elif hasattr(st.session_state.run, 'status') and st.session_state.run.status == 
                     # Calculate tokens and cost
                     num_tokens, message_cost = calculate_message_cost(message_text, "cl100k_base", price_per_1k_tokens)
                     
-                    # Display token count and cost info
-                    cost_info = f"Tokens: {num_tokens}, Estimated Cost: ${message_cost:.4f}"
+                    # Convert cost to user's currency
+                    cost_in_user_currency = message_cost * currency_multiplier
+                    
+                    # Display token count, cost info, and converted cost
+                    cost_info = f"Tokens: {num_tokens}, Estimated Cost: ${message_cost:.4f}, {currency_name}: {cost_in_user_currency:.4f}"
                     st.caption(cost_info)
 
 
