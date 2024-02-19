@@ -33,7 +33,7 @@ st.set_page_config(page_title="Enter title here")
 st.sidebar.title("Title")
 st.sidebar.divider()
 st.sidebar.markdown("Your name", unsafe_allow_html=True)
-st.sidebar.markdown("Assistant GPT")
+st.sidebar.markdown("Grammar bot")
 st.sidebar.divider()
 
 # File uploader for CSV, XLS, XLSX
@@ -84,7 +84,7 @@ elif hasattr(st.session_state.run, 'status') and st.session_state.run.status == 
             with st.chat_message(message.role):
                 for content_part in message.content:
                     message_text = content_part.text.value
-                    st.markdown(message_text)
+                    st.markdown(f"""<div dir="rtl"> {message_text}}</div>""")
 
 # Chat input and message creation with file ID
 if prompt := st.chat_input("How can I help you?"):
