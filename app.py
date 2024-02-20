@@ -100,6 +100,15 @@ if "assistant" not in st.session_state:
         metadata={'session_id': st.session_state.session_id}
     )
 
+# Base price for Assistant 1's messages
+base_price_per_1k_tokens_user = 0.01
+base_price_per_1k_tokens_assistant = 0.03
+
+# Adjust prices for Assistant 2 if needed
+assistant_1_multiplier = 1  # Base multiplier for Assistant 1
+assistant_2_multiplier = 0.05  # One twentieth of the price for Assistant 2
+
+
 # Display chat messages with token count, cost information, and converted cost
 elif hasattr(st.session_state.run, 'status') and st.session_state.run.status == "completed":
     st.session_state.messages = client.beta.threads.messages.list(
@@ -112,11 +121,17 @@ elif hasattr(st.session_state.run, 'status') and st.session_state.run.status == 
                     message_text = content_part.text.value
                     st.markdown(f"""<div dir="rtl"> {message_text}</div>""", unsafe_allow_html=True)
                     
+                    # Adjust pricing based on selected assistant
+                    if st.session_state.selected_assistant_key == "Assistant 1":
+                        multiplier = assistant_1_multiplier
+                    else:  # Assistant 2
+                        multiplier = assistant_2_multiplier
+                    
                     # Determine pricing based on the role
                     if message.role == "user":
-                        price_per_1k_tokens = 0.01
-                    else:  # For assistant's messages, the cost is three times higher
-                        price_per_1k_tokens = 0.03
+                        price_per_1k_tokens = base_price_per_1k_tokens_user * multiplier
+                    else:  # For assistant's messages, the cost is adjusted by the multiplier
+                        price_per_1k_tokens = base_price_per_1k_tokens_assistant * multiplier
                     
                     # Calculate tokens and cost
                     num_tokens, message_cost = calculate_message_cost(message_text, "cl100k_base", price_per_1k_tokens)
