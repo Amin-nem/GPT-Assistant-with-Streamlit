@@ -8,6 +8,8 @@ import io
 from openai import OpenAI
 import tiktoken
 
+st.set_page_config(page_title="Grammar Assistant with Cost Calculator")
+
 # calculate message cost
 def calculate_message_cost(message: str, encoding_name: str, price_per_1k_tokens: float):
     encoding = tiktoken.get_encoding(encoding_name)
@@ -48,7 +50,6 @@ if "selected_assistant_key" not in st.session_state or st.session_state.selected
 
 
 # Set up the page
-st.set_page_config(page_title="Grammar Assistant with Cost Calculator")
 st.sidebar.title("Grammar Assistant")
 st.sidebar.divider()
 st.sidebar.markdown("Your name", unsafe_allow_html=True)
