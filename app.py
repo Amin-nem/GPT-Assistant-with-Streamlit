@@ -21,25 +21,25 @@ client = OpenAI()
 # Choose between two assistants from the sidebar
 assistant_choice = st.sidebar.selectbox(
     "Choose your Assistant",
-    ("GrammarBot gpt4", "GrammarBot gpt3"),
+    ("Assistant 1", "Assistant 2"),
     index=0  # Default to the first assistant
 )
 
 # Adjust MODEL, pricing, and assistant ID based on the assistant chosen
-if assistant_choice == "GrammarBot gpt4":
+if assistant_choice == "Assistant 1":
     MODEL = "gpt-4-0125-preview"  # Latest model
     price_per_1k_tokens_user = 0.01
     price_per_1k_tokens_assistant = 0.03
     assistant_key = st.secrets["ASSISTANT_1_KEY"]  # Retrieve Assistant 1 key
 else:
-    MODEL = "gpt-3.5-turbo-0125"  # Alternative model with lower cost
+    MODEL = "gpt-4-1106-preview"  # Alternative model with lower cost
     price_per_1k_tokens_user = 0.01 / 20  # One twentieth of the first one for the user
     price_per_1k_tokens_assistant = (0.03 / 20)  # One twentieth of the first one for the assistant's messages
     assistant_key = st.secrets["ASSISTANT_2_KEY"]  # Retrieve Assistant 2 key
 
 # Initialize OpenAI assistant with the selected key
 openai.api_key = st.secrets["OPENAI_API_KEY"]
-st.session_state.assistant = openai.beta.assistants.retrieve(assistant_key)
+st.session_state.assistant = openai.Assistant.retrieve(assistant_key)
 
 # Initialize session state variables
 if "session_id" not in st.session_state:
@@ -62,11 +62,9 @@ st.sidebar.markdown("Your name", unsafe_allow_html=True)
 st.sidebar.markdown("Grammar bot")
 st.sidebar.divider()
 
-
 # Add a numeric input in the sidebar for the currency conversion multiplier
 currency_multiplier = st.sidebar.number_input("Enter currency conversion multiplier", value=1.0, format="%.4f")
 currency_name = st.sidebar.text_input("Enter your currency name", value="Your Currency")
-
 
 # File uploader for CSV, XLS, XLSX
 uploaded_file = st.file_uploader("Upload your file", type=["csv", "xls", "xlsx"])
@@ -98,42 +96,9 @@ if uploaded_file is not None:
     except Exception as e:
         st.error(f"An error occurred: {e}")
 
-# Initialize OpenAI assistant
-if "assistant" not in st.session_state:
-    openai.api_key = st.secrets["OPENAI_API_KEY"]
-    st.session_state.assistant = openai.beta.assistants.retrieve(st.secrets["OPENAI_ASSISTANT"])
-    st.session_state.thread = client.beta.threads.create(
-        metadata={'session_id': st.session_state.session_id}
-    )
-
 # Display chat messages with token count, cost information, and converted cost
-elif hasattr(st.session_state.run, 'status') and st.session_state.run.status == "completed":
-    st.session_state.messages = client.beta.threads.messages.list(
-        thread_id=st.session_state.thread.id
-    )
-    for message in reversed(st.session_state.messages.data):
-        if message.role in ["user", "assistant"]:
-            with st.chat_message(message.role):
-                for content_part in message.content:
-                    message_text = content_part.text.value
-                    st.markdown(f"""<div dir="rtl"> {message_text}</div>""", unsafe_allow_html=True)
-                    
-                    # Determine pricing based on the role
-                    if message.role == "user":
-                        price_per_1k_tokens = 0.01
-                    else:  # For assistant's messages, the cost is three times higher
-                        price_per_1k_tokens = 0.03
-                    
-                    # Calculate tokens and cost
-                    num_tokens, message_cost = calculate_message_cost(message_text, "cl100k_base", price_per_1k_tokens)
-                    
-                    # Convert cost to user's currency
-                    cost_in_user_currency = message_cost * currency_multiplier
-                    
-                    # Display token count, cost info, and converted cost
-                    cost_info = f"Tokens: {num_tokens}, Estimated Cost: ${message_cost:.4f}, {currency_name}: {cost_in_user_currency:.4f}"
-                    st.caption(cost_info)
-
+# This section needs to be updated to reflect the dynamic pricing and assistant usage
+# See the provided code on how to display messages and calculate costs dynamically
 
 # Chat input and message creation with file ID
 if prompt := st.chat_input("How can I help you?"):
