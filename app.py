@@ -100,15 +100,6 @@ if "assistant" not in st.session_state:
         metadata={'session_id': st.session_state.session_id}
     )
 
-# Base price for Assistant 1's messages
-base_price_per_1k_tokens_user = 0.01
-base_price_per_1k_tokens_assistant = 0.03
-
-# Adjust prices for Assistant 2 if needed
-assistant_1_multiplier = 1  # Base multiplier for Assistant 1
-assistant_2_multiplier = 0.05  # One twentieth of the price for Assistant 2
-
-
 # Display chat messages with token count, cost information, and converted cost
 elif hasattr(st.session_state.run, 'status') and st.session_state.run.status == "completed":
     st.session_state.messages = client.beta.threads.messages.list(
@@ -142,7 +133,6 @@ elif hasattr(st.session_state.run, 'status') and st.session_state.run.status == 
                     # Display token count, cost info, and converted cost
                     cost_info = f"Tokens: {num_tokens}, Estimated Cost: ${message_cost:.4f}, {currency_name}: {cost_in_user_currency:.4f}"
                     st.caption(cost_info)
-
 
 # Chat input and message creation with file ID
 if prompt := st.chat_input("How can I help you?"):
