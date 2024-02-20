@@ -39,7 +39,7 @@ else:
 
 # Initialize OpenAI assistant with the selected key
 openai.api_key = st.secrets["OPENAI_API_KEY"]
-st.session_state.assistant = openai.Assistant.retrieve(assistant_key)
+st.session_state.assistant = openai..beta.assistant.retrieve(assistant_key)
 
 # Initialize session state variables
 if "session_id" not in st.session_state:
