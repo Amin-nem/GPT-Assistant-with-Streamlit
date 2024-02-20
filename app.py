@@ -17,6 +17,16 @@ def calculate_message_cost(message: str, encoding_name: str, price_per_1k_tokens
     cost = (num_tokens / 1000) * price_per_1k_tokens
     return num_tokens, cost
 
+
+# Base price for Assistant 1's messages
+base_price_per_1k_tokens_user = 0.01
+base_price_per_1k_tokens_assistant = 0.03
+
+# Adjust prices for Assistant 2 if needed
+assistant_1_multiplier = 1  # Base multiplier for Assistant 1
+assistant_2_multiplier = 0.05  # One twentieth of the price for Assistant 2
+
+
 # Initialize OpenAI client
 client = OpenAI()
 
