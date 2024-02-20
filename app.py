@@ -1,4 +1,4 @@
- # Importing required packages
+# Importing required packages
 import streamlit as st
 import openai
 import uuid
@@ -15,15 +15,10 @@ def calculate_message_cost(message: str, encoding_name: str, price_per_1k_tokens
     cost = (num_tokens / 1000) * price_per_1k_tokens
     return num_tokens, cost
 
-
 # Initialize OpenAI client
 client = OpenAI()
 
-# Your chosen model
-MODEL = "gpt-4-0125-preview" # Latest model
-#MODEL = "gpt-4-1106-preview"
-
-# Initialize session state variables
+# Initialize session state variables if not already set
 if "session_id" not in st.session_state:
     st.session_state.session_id = str(uuid.uuid4())
 
@@ -35,6 +30,22 @@ if "messages" not in st.session_state:
 
 if "retry_error" not in st.session_state:
     st.session_state.retry_error = 0
+
+# Assistant selection in sidebar
+assistant_options = {"Assistant 1": st.secrets["OPENAI_ASSISTANT_1"], "Assistant 2": st.secrets["OPENAI_ASSISTANT_2"]}
+selected_assistant = st.sidebar.radio("Choose an Assistant:", list(assistant_options.keys()))
+
+# Check if assistant changed and reset session
+if "selected_assistant_key" not in st.session_state or st.session_state.selected_assistant_key != selected_assistant:
+    st.session_state.selected_assistant_key = selected_assistant
+    st.session_state.assistant_id = assistant_options[selected_assistant]
+    st.session_state.messages = []
+    st.session_state.run = {"status": None}
+    # Create a new thread for the new assistant
+    st.session_state.thread = client.beta.threads.create(
+        metadata={'session_id': st.session_state.session_id}
+    )
+
 
 # Set up the page
 st.set_page_config(page_title="Grammar Assistant with Cost Calculator")
@@ -83,7 +94,7 @@ if uploaded_file is not None:
 # Initialize OpenAI assistant
 if "assistant" not in st.session_state:
     openai.api_key = st.secrets["OPENAI_API_KEY"]
-    st.session_state.assistant = openai.beta.assistants.retrieve(st.secrets["OPENAI_ASSISTANT"])
+    st.session_state.assistant = openai.beta.assistants.retrieve(st.session_state.assistant_id)
     st.session_state.thread = client.beta.threads.create(
         metadata={'session_id': st.session_state.session_id}
     )
