@@ -8,49 +8,20 @@ import io
 from openai import OpenAI
 import tiktoken
 
-
-# Set up the page
-st.set_page_config(page_title="Grammar Assistant with Cost Calculator")
-st.sidebar.title("Grammar Assistant")
-st.sidebar.divider()
-st.sidebar.markdown("Your name", unsafe_allow_html=True)
-st.sidebar.markdown("Grammar bot")
-st.sidebar.divider()
-
-
-# Function to calculate message cost
+# calculate message cost
 def calculate_message_cost(message: str, encoding_name: str, price_per_1k_tokens: float):
     encoding = tiktoken.get_encoding(encoding_name)
     num_tokens = len(encoding.encode(message))
     cost = (num_tokens / 1000) * price_per_1k_tokens
     return num_tokens, cost
 
+
 # Initialize OpenAI client
 client = OpenAI()
 
-# Choose between two assistants from the sidebar
-assistant_choice = st.sidebar.selectbox(
-    "Choose your Assistant",
-    ("Assistant 1", "Assistant 2"),
-    index=0  # Default to the first assistant
-)
-
-# Adjust MODEL, pricing, and assistant ID based on the assistant chosen
-if assistant_choice == "Assistant 1":
-    MODEL = "gpt-4-0125-preview"  # Latest model
-    price_per_1k_tokens_user = 0.01
-    price_per_1k_tokens_assistant = 0.03
-    assistant_key = st.secrets["ASSISTANT_1_KEY"]  # Retrieve Assistant 1 key
-else:
-    MODEL = "gpt-4-1106-preview"  # Alternative model with lower cost
-    price_per_1k_tokens_user = 0.01 / 20  # One twentieth of the first one for the user
-    price_per_1k_tokens_assistant = (0.03 / 20)  # One twentieth of the first one for the assistant's messages
-    assistant_key = st.secrets["ASSISTANT_2_KEY"]  # Retrieve Assistant 2 key
-
-# Initialize OpenAI assistant with the selected key
-openai.api_key = st.secrets["OPENAI_API_KEY"]
-st.session_state.assistant = openai.beta.assistants.retrieve(assistant_key)
-
+# Your chosen model
+MODEL = "gpt-4-0125-preview" # Latest model
+#MODEL = "gpt-4-1106-preview"
 
 # Initialize session state variables
 if "session_id" not in st.session_state:
@@ -64,6 +35,14 @@ if "messages" not in st.session_state:
 
 if "retry_error" not in st.session_state:
     st.session_state.retry_error = 0
+
+# Set up the page
+st.set_page_config(page_title="Grammar Assistant with Cost Calculator")
+st.sidebar.title("Grammar Assistant")
+st.sidebar.divider()
+st.sidebar.markdown("Your name", unsafe_allow_html=True)
+st.sidebar.markdown("Grammar bot")
+st.sidebar.divider()
 
 
 # Add a numeric input in the sidebar for the currency conversion multiplier
