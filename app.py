@@ -62,7 +62,7 @@ if "selected_assistant_key" not in st.session_state or st.session_state.selected
 # Set up the page
 st.sidebar.title("Grammar Assistant")
 st.sidebar.divider()
-st.sidebar.markdown("Your name", unsafe_allow_html=True)
+st.sidebar.markdown("Your name")
 st.sidebar.markdown("Grammar bot")
 st.sidebar.divider()
 
